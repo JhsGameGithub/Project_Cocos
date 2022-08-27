@@ -13,9 +13,16 @@ private:
 
 	Renderer& m_renderer;
 public:
+	//생성자 및 소멸자
 	explicit Engine(Renderer& a_renderer);
 	~Engine();
-	void Run();
+
+public:
+	//Getter 및 Setter 
 	Scene* Get_Scene() const;
 	void Set_Scene(Scene* a_scene);
+
+public:
+	//일반 함수
+	void Run();
 };
