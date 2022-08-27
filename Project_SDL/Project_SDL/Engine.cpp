@@ -3,10 +3,26 @@
 
 #include "Engine.h"
 #include "Renderer.h"
+#include "Scene.h"
 
-Engine::Engine(Renderer& a_renderer) : m_renderer(a_renderer)
+Engine::Engine(Renderer& a_renderer) : m_renderer(a_renderer), m_scene(new Scene())
 {
 
+}
+
+Engine::~Engine()
+{
+	delete m_scene;
+}
+
+Scene* Engine::Get_Scene() const
+{
+	return m_scene;
+}
+
+void Engine::Set_Scene(Scene* a_scene)
+{
+	m_scene = a_scene;
 }
 
 void Engine::Run()
@@ -37,7 +53,7 @@ void Engine::Run()
 				if (SDL_PollEvent(&sdl_event))
 					if (sdl_event.type == SDL_QUIT)
 						break;
-				m_renderer.Rendering();
+				m_renderer.Rendering(m_scene);	
 			}
 		}
 	}

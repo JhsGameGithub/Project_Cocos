@@ -1,8 +1,10 @@
 #pragma once
 
+class Scene;
+
 class Renderer
 {
 public:
 	void Init();
-	void Rendering();
+	void Rendering(const Scene* a_scene);
 };
