@@ -2,11 +2,19 @@
 #include <SDL.h>
 
 #include "Engine.h"
+#include "Renderer.h"
+
+Engine::Engine(Renderer& a_renderer) : m_renderer(a_renderer)
+{
+
+}
 
 void Engine::Run()
 {
 	//렌더링을 진행할 윈도우 객체 선언
 	SDL_Window* window = NULL;
+
+	m_renderer.Init();
 
 	//SDL 초기화
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -29,6 +37,7 @@ void Engine::Run()
 				if (SDL_PollEvent(&sdl_event))
 					if (sdl_event.type == SDL_QUIT)
 						break;
+				m_renderer.Rendering();
 			}
 		}
 	}
