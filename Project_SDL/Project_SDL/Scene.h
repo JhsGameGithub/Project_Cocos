@@ -7,7 +7,6 @@ class Scene
 {
 private:
 	std::vector<Object*> object_vec;
-
 public:
 	void Register_Object(Object* object);
 	void Start();

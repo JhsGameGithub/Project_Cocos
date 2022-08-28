@@ -8,5 +8,5 @@ void Renderer::Init()
 
 void Renderer::Rendering(const Scene* a_scene)
 {
-	printf("¾À ·»´õ¸µ");
+
 }
