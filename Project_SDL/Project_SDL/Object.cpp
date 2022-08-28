@@ -3,10 +3,9 @@
 
 void Object::Start()
 {
-	printf("%d\n", m_num);
 	for (auto& component : m_component_map)
 		component.second->Start();
-	for (Object* object : m_child_vec)
+	for (Object* object : m_child_list)
 		object->Start();
 }
 
@@ -14,16 +13,32 @@ void Object::Update()
 {
 	for (auto& component : m_component_map)
 		component.second->Update();
-	for (Object* object : m_child_vec)
+	for (Object* object : m_child_list)
 		object->Update();
 }
 
-void Object::Add_Component(Component* component)
+void Object::Add_Child(Object* a_object)
 {
-	unsigned int component_code = typeid(component).hash_code();
+	m_child_list.push_back(a_object);
+}
+
+void Object::Set_Parent(Object* a_object)
+{
+	m_parent = a_object;
+}
+
+void Object::Add_Component(Component* a_component)
+{
+	unsigned int component_code = typeid(a_component).hash_code();
 	//컴포넌트 추가 실패
 	if (m_component_map.find(component_code) != m_component_map.end())
+	{
+		printf("컴포넌트 추가 실패");
 		return;
+	}
 	else
-		m_component_map.insert({ component_code,component });
+	{
+		a_component->Set_Object(this);
+		m_component_map.insert({ component_code,a_component });
+	}
 }

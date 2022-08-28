@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <list>
 #include <unordered_map>
 #include <typeinfo>
 
@@ -8,16 +8,15 @@ class Component;
 class Object
 {
 private:
-	unsigned int m_num;
 	Object* m_parent;
-	std::vector<Object*> m_child_vec;
+	std::list<Object*> m_child_list;
 	std::unordered_map<unsigned int, Component*> m_component_map;
 public:
 	void Start();
 	void Update();
-	
-	void Set_Num(unsigned int a_num) { m_num = a_num; }
 
+	void Add_Child(Object* a_child);
+	void Set_Parent(Object* a_parent);
 
 	//컴포넌트 가져오기
 	template<class T>
@@ -28,5 +27,5 @@ public:
 	}
 
 	//컴포넌트 추가하기
-	void Add_Component(Component* component);
+	void Add_Component(Component* a_component);
 };
