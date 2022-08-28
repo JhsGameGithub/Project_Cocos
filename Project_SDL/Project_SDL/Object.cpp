@@ -1,5 +1,15 @@
 #include "Object.h"
-#include "Component.h"
+#include "Transform.h"
+
+Object::Object() : m_transform(new Transform()), m_parent(nullptr)
+{
+	m_transform->Set_Object(this);
+}
+
+Object::~Object()
+{
+	delete m_transform;
+}
 
 void Object::Start()
 {
@@ -19,6 +29,7 @@ void Object::Update()
 
 void Object::Add_Child(Object* a_object)
 {
+	a_object->Set_Parent(this);
 	m_child_list.push_back(a_object);
 }
 
@@ -41,4 +52,9 @@ void Object::Add_Component(Component* a_component)
 		a_component->Set_Object(this);
 		m_component_map.insert({ component_code,a_component });
 	}
+}
+
+Transform* Object::Get_Transform()
+{
+	return m_transform;
 }

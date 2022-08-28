@@ -48,14 +48,15 @@ void Engine::Run()
 		else
 		{
 			m_scene->Start();
+			m_renderer.Rendering(m_scene);
 			while (true)
 			{
 				SDL_Event sdl_event;
 				if (SDL_PollEvent(&sdl_event))
 					if (sdl_event.type == SDL_QUIT)
 						break;
-				m_renderer.Rendering(m_scene);
 				m_scene->Update();
+				m_renderer.Rendering(m_scene);
 			}
 		}
 	}
