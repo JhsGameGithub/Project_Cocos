@@ -57,7 +57,7 @@ namespace RendererHelper
 		//명령 대기열과 명령 목록 생성
 		void Create_Command_Objects();
 		//교환 사슬의 서술과 생성
-		void Create_Swap_Chain();
+		void Create_Swap_Chain(const int height, const int width, HWND* hwnd);
 		//서술자 힙 생성
 		void Create_Descriptor_Hepas();
 		//렌더 대상 뷰 생성

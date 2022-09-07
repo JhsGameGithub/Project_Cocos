@@ -67,7 +67,44 @@ void RendererHelper::Renderer::Create_Command_Objects()
 	m_command_list->Close();
 }
 
-void RendererHelper::Renderer::Create_Swap_Chain()
+void RendererHelper::Renderer::Create_Swap_Chain(const int height,const int width, HWND* hwnd)
 {
+	// 기존 교환 사슬 해제
+	m_swap_chain.Reset();
 
+	DXGI_SWAP_CHAIN_DESC sd;
+	sd.BufferDesc.Width = width;
+	sd.BufferDesc.Height = height;
+	sd.BufferDesc.RefreshRate.Numerator = 60;
+	sd.BufferDesc.RefreshRate.Denominator = 1;
+	sd.BufferDesc.Format = m_back_buffer_format;
+	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	sd.SampleDesc.Count = 4;
+	sd.SampleDesc.Quality = m_4xmsaa_quality - 1;
+	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	sd.OutputWindow = *hwnd;
+	sd.Windowed = true;
+	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+	ThrowIfFailed(m_dxgi_factory->CreateSwapChain(m_command_queue.Get(), &sd, m_swap_chain.GetAddressOf()));
+}
+
+void RendererHelper::Renderer::Create_Descriptor_Hepas()
+{
+	D3D12_DESCRIPTOR_HEAP_DESC rtv_heap_desc;
+	rtv_heap_desc.NumDescriptors = m_swap_chain_buffer_count;
+	rtv_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+	rtv_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	rtv_heap_desc.NodeMask = 0;
+	ThrowIfFailed(m_d3d12_device->CreateDescriptorHeap(&rtv_heap_desc, IID_PPV_ARGS(m_rtv_heap.GetAddressOf())));
+
+
+	D3D12_DESCRIPTOR_HEAP_DESC dsv_heap_desc;
+	dsv_heap_desc.NumDescriptors = 1;
+	dsv_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+	dsv_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	dsv_heap_desc.NodeMask = 0;
+	ThrowIfFailed(m_d3d12_device->CreateDescriptorHeap(&dsv_heap_desc, IID_PPV_ARGS(m_dsv_heap.GetAddressOf())));
 }
