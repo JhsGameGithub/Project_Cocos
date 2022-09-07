@@ -108,3 +108,34 @@ void RendererHelper::Renderer::Create_Descriptor_Hepas()
 	dsv_heap_desc.NodeMask = 0;
 	ThrowIfFailed(m_d3d12_device->CreateDescriptorHeap(&dsv_heap_desc, IID_PPV_ARGS(m_dsv_heap.GetAddressOf())));
 }
+
+D3D12_CPU_DESCRIPTOR_HANDLE RendererHelper::Renderer::Current_Back_Buffer_View() const
+{
+	//이 생성자는 주어진 오프셋에 해당하는 후면 버퍼
+	//RTV의 핸들을 돌려준다.
+	return CD3DX12_CPU_DESCRIPTOR_HANDLE(
+		m_rtv_heap->GetCPUDescriptorHandleForHeapStart(),
+		m_current_back_buffer,
+		m_rtv_descriptor_size
+	);
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE RendererHelper::Renderer::Depth_Stencil_View() const
+{
+	return m_dsv_heap->GetCPUDescriptorHandleForHeapStart();
+}
+
+void RendererHelper::Renderer::Create_Render_Target_View()
+{
+	CD3DX12_CPU_DESCRIPTOR_HANDLE rtv_heap_handle(m_rtv_heap->GetCPUDescriptorHandleForHeapStart());
+
+	for (UINT i = 0; i < m_swap_chain_buffer_count; i++)
+	{
+		//교환 사슬의 i번째 버퍼를 얻는다.
+		ThrowIfFailed(m_swap_chain->GetBuffer(i, IID_PPV_ARGS(&m_swap_chain_buffer[i])));
+		//그 버퍼에 대한 RTV를 생성한다.
+		m_d3d12_device->CreateRenderTargetView(m_swap_chain_buffer[i].Get(), nullptr, rtv_heap_handle);
+		//힙의 다음 항목으로 넘어간다.
+		rtv_heap_handle.Offset(1, m_rtv_descriptor_size);
+	}
+}

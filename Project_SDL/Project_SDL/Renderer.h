@@ -69,6 +69,10 @@ namespace RendererHelper
 		//가위 직사각형 설정
 		void Set_Scissor_Rect();
 
+		D3D12_CPU_DESCRIPTOR_HANDLE Current_Back_Buffer_View() const;
+
+		D3D12_CPU_DESCRIPTOR_HANDLE Depth_Stencil_View() const;
+
 		//화면에 그리기
 		void Rendering(const Scene* a_scene);
 	};
