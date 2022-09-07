@@ -178,3 +178,46 @@ void RendererHelper::Renderer::Create_Depth_Stencil_View(const int height, const
 		&CD3DX12_RESOURCE_BARRIER::Transition(m_depth_stencil_buffer.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE)
 	);
 }
+
+void RendererHelper::Renderer::Set_Viewport(const int height, const int width)
+{
+	m_screen_viewport.TopLeftX = 0.0f;
+	m_screen_viewport.TopLeftY = 0.0f;
+	m_screen_viewport.Width = static_cast<float>(width);
+	m_screen_viewport.Height = static_cast<float>(height);
+	m_screen_viewport.MinDepth = 0.0f;
+	m_screen_viewport.MaxDepth = 1.0f;
+
+	m_command_list->RSSetViewports(1, &m_screen_viewport);
+}
+
+void RendererHelper::Renderer::Set_Scissor_Rect(const int height, const int width)
+{
+	m_scissor_rect = { 0,0,width,height };
+	m_command_list->RSSetScissorRects(1, &m_scissor_rect);
+}
+
+void RendererHelper::Init_Renderer(const int height, const int width, HWND* hwnd, Renderer* renderer)
+{
+	// 1.장치생성
+	renderer->Create_Device();
+	// 2.울타리 생성과 서술자 크기 얻기
+	renderer->Create_Fecne();
+	renderer->Get_Descriptor_Size();
+	// 3.4X MSAA 품질 수준 지원 점검
+	renderer->Inspect_4XMSAA_Quality();
+	// 4.명령 대기열과 명령 목록 생성
+	renderer->Create_Command_Objects();
+	// 5.교환 사슬의 서술과 생성
+	renderer->Create_Swap_Chain(height, width, hwnd);
+	// 6.서술자 힙 생성
+	renderer->Create_Descriptor_Hepas();
+	// 7.렌더 대상 뷰(RTV) 생성
+	renderer->Create_Render_Target_View();
+	// 8.깊이, 스텐실 버퍼와 뷰 생성
+	renderer->Create_Depth_Stencil_View(height, width);
+	// 9.뷰포트 설정
+	renderer->Set_Viewport(height, width);
+	// 10.가위 직사각형 설정
+	renderer->Set_Scissor_Rect(height, width);
+}

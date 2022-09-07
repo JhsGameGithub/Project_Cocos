@@ -65,9 +65,9 @@ namespace RendererHelper
 		//깊이, 스텐실 버퍼와 뷰 생성
 		void Create_Depth_Stencil_View(const int height, const int width);
 		//뷰포트 설정
-		void Set_Viewport();
+		void Set_Viewport(const int height, const int width);
 		//가위 직사각형 설정
-		void Set_Scissor_Rect();
+		void Set_Scissor_Rect(const int height, const int width);
 
 		D3D12_CPU_DESCRIPTOR_HANDLE Current_Back_Buffer_View() const;
 
