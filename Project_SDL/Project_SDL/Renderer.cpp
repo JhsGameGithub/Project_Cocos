@@ -139,3 +139,42 @@ void RendererHelper::Renderer::Create_Render_Target_View()
 		rtv_heap_handle.Offset(1, m_rtv_descriptor_size);
 	}
 }
+
+void RendererHelper::Renderer::Create_Depth_Stencil_View(const int height, const int width)
+{
+	D3D12_RESOURCE_DESC depth_stencil_desc;
+	depth_stencil_desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	depth_stencil_desc.Alignment = 0;
+	depth_stencil_desc.Width = width;
+	depth_stencil_desc.Height = height;
+	depth_stencil_desc.DepthOrArraySize = 1;
+	depth_stencil_desc.MipLevels = 1;
+	depth_stencil_desc.Format = m_depth_stencil_format;
+	depth_stencil_desc.SampleDesc.Count = 4;
+	depth_stencil_desc.SampleDesc.Quality = m_4xmsaa_quality - 1;
+	depth_stencil_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	depth_stencil_desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+	D3D12_CLEAR_VALUE opt_clear;
+	opt_clear.Format = m_depth_stencil_format;
+	opt_clear.DepthStencil.Depth = 1.0f;
+	opt_clear.DepthStencil.Stencil = 0;
+	ThrowIfFailed(m_d3d12_device->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		D3D12_HEAP_FLAG_NONE,
+		&depth_stencil_desc,
+		D3D12_RESOURCE_STATE_COMMON,
+		&opt_clear,
+		IID_PPV_ARGS(m_depth_stencil_buffer.GetAddressOf())
+	));
+
+	// 전체 자원이 밉맵 수준 0에 대한 서술자를
+	// 해당 자원의 픽셀 형식을 적용해서 생성한다.
+	m_d3d12_device->CreateDepthStencilView(m_depth_stencil_buffer.Get(), nullptr, Depth_Stencil_View());
+
+	// 자원을 초기 상태에서 깊이 버퍼로 사용할 수 있는 상태로 전이
+	m_command_list->ResourceBarrier(
+		1,
+		&CD3DX12_RESOURCE_BARRIER::Transition(m_depth_stencil_buffer.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE)
+	);
+}

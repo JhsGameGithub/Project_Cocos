@@ -63,7 +63,7 @@ namespace RendererHelper
 		//렌더 대상 뷰 생성
 		void Create_Render_Target_View();
 		//깊이, 스텐실 버퍼와 뷰 생성
-		void Create_Depth_Stencil_View();
+		void Create_Depth_Stencil_View(const int height, const int width);
 		//뷰포트 설정
 		void Set_Viewport();
 		//가위 직사각형 설정
