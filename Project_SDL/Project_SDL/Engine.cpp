@@ -5,7 +5,7 @@
 #include "Renderer.h"
 #include "Scene.h"
 
-Engine::Engine(Renderer& a_renderer) : m_renderer(a_renderer), m_scene(new Scene())
+Engine::Engine() : m_renderer(nullptr), m_scene(new Scene())
 {
 
 }
@@ -30,8 +30,6 @@ void Engine::Run()
 	//렌더링을 진행할 윈도우 객체 선언
 	SDL_Window* window = NULL;
 
-	m_renderer.Init();
-
 	//SDL 초기화
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
@@ -47,8 +45,10 @@ void Engine::Run()
 		}
 		else
 		{
+			HWND hwnd = GetActiveWindow();
+			RendererHelper::Init_Renderer(SCREEN_HEIGHT, SCREEN_WIDTH, &hwnd, m_renderer);
 			m_scene->Start();
-			m_renderer.Rendering(m_scene);
+			m_renderer->Rendering(m_scene);
 			while (true)
 			{
 				SDL_Event sdl_event;
@@ -56,7 +56,7 @@ void Engine::Run()
 					if (sdl_event.type == SDL_QUIT)
 						break;
 				m_scene->Update();
-				m_renderer.Rendering(m_scene);
+				m_renderer->Rendering(m_scene);
 			}
 		}
 	}

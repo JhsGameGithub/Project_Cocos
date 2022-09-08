@@ -17,3 +17,8 @@ void Scene::Update()
 	for (Object* object : object_vec)
 		object->Update();
 }
+
+auto Scene::Get_Object_Iter() const ->decltype(object_vec.begin())
+{
+	return object_vec.begin();
+}

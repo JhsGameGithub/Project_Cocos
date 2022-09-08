@@ -2,6 +2,7 @@
 #include <assert.h>
 
 #include "Renderer.h"
+#include "Scene.h"
 
 void RendererHelper::Renderer::Create_Device()
 {
@@ -220,4 +221,79 @@ void RendererHelper::Init_Renderer(const int height, const int width, HWND* hwnd
 	renderer->Set_Viewport(height, width);
 	// 10.가위 직사각형 설정
 	renderer->Set_Scissor_Rect(height, width);
+}
+
+void RendererHelper::Renderer::Rendering(Scene* a_scene)
+{
+	a_scene->Render();
+}
+
+
+Microsoft::WRL::ComPtr<ID3D12Resource> RendererHelper::Renderer::Create_Default_Buffer(ID3D12Device* device, ID3D12GraphicsCommandList* cmd_list, const void* init_data, UINT64 byte_size, ComPtr<ID3D12Resource>& upload_buffer)
+{
+	using namespace Microsoft;
+	using namespace WRL;
+
+	ComPtr<ID3D12Resource> default_buffer;
+	// 실제 기본 버퍼 자원을 생성
+	ThrowIfFailed(device->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer(byte_size),
+		D3D12_RESOURCE_STATE_COMMON,
+		nullptr,
+		IID_PPV_ARGS(default_buffer.GetAddressOf())
+	));
+
+	// CPU 메모리의 자료를 기본 버퍼에 복사하려면
+	// 임시 업로드 힙을 만들어야 함
+	ThrowIfFailed(device->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer(byte_size),
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(upload_buffer.GetAddressOf())
+	));
+
+	// 기본 버퍼에 복사할 자료를 서술
+	D3D12_SUBRESOURCE_DATA sub_resource_data = {};
+	sub_resource_data.pData = init_data;
+	sub_resource_data.RowPitch = byte_size;
+	sub_resource_data.SlicePitch = sub_resource_data.RowPitch;
+
+	//기본 버퍼 자원으로의 자료 복사를 요청
+	// 개략적으로 말하자면, 보조 함수 UpdateSubresources는 CPU 메모리를
+	// 임시 업로드 힙에 복사하고, ID3D12CommandList::CopySubresourceRegion을
+	//이용해서 임시 업로드 힙의 자료를 mBuffer에 복사
+	cmd_list->ResourceBarrier(
+		1,
+		&CD3DX12_RESOURCE_BARRIER::Transition(default_buffer.Get(),
+			D3D12_RESOURCE_STATE_COMMON,
+			D3D12_RESOURCE_STATE_COPY_DEST
+		));
+
+	UpdateSubresources<1>(
+		cmd_list,
+		default_buffer.Get(),
+		upload_buffer.Get(),
+		0,
+		0,
+		1,
+		&sub_resource_data);
+
+	cmd_list->ResourceBarrier(
+		1,
+		&CD3DX12_RESOURCE_BARRIER::Transition(default_buffer.Get(),
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			D3D12_RESOURCE_STATE_GENERIC_READ
+		));
+
+	// 주의 : 위의 함수 호출 이후에도 upload_buffer를 계속
+	// 유지해야 한다. 실제로 복사를 수행하는 명령 목록이
+	// 아직 실행되지 않았기 때문이다.
+	// 복사가 완료되었음이 확실해진 후에 호출자가 upload_buffer를
+	// 해제하면 된다.
+
+	return default_buffer;
 }

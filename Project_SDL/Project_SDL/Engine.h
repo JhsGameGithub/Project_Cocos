@@ -1,6 +1,8 @@
 #pragma once
 
-class Renderer;
+namespace RendererHelper{
+	class Renderer;
+}
 class Scene;
 
 class Engine
@@ -11,10 +13,10 @@ private:
 
 	Scene* m_scene;
 
-	Renderer& m_renderer;
+	RendererHelper::Renderer* m_renderer;
 public:
 	//생성자 및 소멸자
-	explicit Engine(Renderer& a_renderer);
+	explicit Engine();
 	~Engine();
 
 public:

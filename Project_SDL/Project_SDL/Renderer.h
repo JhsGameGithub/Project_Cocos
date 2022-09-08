@@ -73,10 +73,14 @@ namespace RendererHelper
 
 		D3D12_CPU_DESCRIPTOR_HANDLE Depth_Stencil_View() const;
 
+		ComPtr<ID3D12Resource> Create_Default_Buffer(ID3D12Device* device,ID3D12GraphicsCommandList* cmd_list,const void* init_data,UINT64 byte_size,ComPtr<ID3D12Resource>& upload_buffer);
+
 		//화면에 그리기
-		void Rendering(const Scene* a_scene);
+		void Rendering(Scene* a_scene);
 	};
 
+	// 캡슐화를 위해 초기화 함수를 별도로 분리
+	// 클래스 멤버 변수의 접근 경로를 줄이는 효과
 	void Init_Renderer(const int height, const int width, HWND* hwnd, Renderer* renderer);
 
 	inline void ThrowIfFailed(HRESULT hr)
