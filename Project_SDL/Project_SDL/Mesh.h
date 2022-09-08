@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <DirectXMath.h>
 
+#include "Component.h"
 
 namespace MeshHelper
 {
@@ -30,21 +31,22 @@ namespace MeshHelper
 	};
 
 	static unordered_map<string, LineHeader> line_header_map = {
-		{"v",      LineHeader::POSITION},
-		{"vt",     LineHeader::TEXCOORD},
-		{"vn",     LineHeader::NORMAL},
-		{"f",      LineHeader::FACE},
-		{"mtllib", LineHeader::MTLLIB}
+		{ "v",      LineHeader::POSITION },
+		{ "vt",     LineHeader::TEXCOORD },
+		{ "vn",     LineHeader::NORMAL   },
+		{ "f",      LineHeader::FACE     },
+		{ "mtllib", LineHeader::MTLLIB   }
 	};
 
-	class Mesh
+	class Mesh : public Component
 	{
 	private:
-		vector<XMFLOAT3> vertex_positions;
-		vector<XMFLOAT2> vertex_texcoords;
-		vector<XMFLOAT3> vertex_normals;
-		vector<Face> face_bundle;
+		vector<XMFLOAT3> position_bundle;
+		vector<XMFLOAT2> texcoord_bundle;
+		vector<XMFLOAT3> normal_bundle;
+		vector<Face>     face_bundle;
+
 	public:
-		void LoadMesh(std::string file_name);
+		void Load_Mesh(std::string file_name);
 	};
 }
