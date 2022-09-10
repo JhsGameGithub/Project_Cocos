@@ -13,5 +13,5 @@ public:
 	void Update();
 	void Render();
 
-	auto Get_Object_Iter() const ->decltype(object_vec.begin());
+	const std::vector<Object*>& Get_Object_Vec() const;
 };

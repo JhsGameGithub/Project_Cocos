@@ -2,6 +2,9 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <d3d12.h>
+#include <d3dx12.h>
+#include <dxgi1_6.h>
 #include <DirectXMath.h>
 
 #include "Component.h"
@@ -10,6 +13,8 @@ namespace MeshHelper
 {
 	using namespace std;
 	using namespace DirectX;
+	using namespace Microsoft;
+	using namespace WRL;
 
 	struct Face
 	{
@@ -49,4 +54,11 @@ namespace MeshHelper
 	public:
 		void Load_Mesh(std::string file_name);
 	};
+	
+	static ComPtr<ID3D12Resource> Create_Default_Buffer(
+		ID3D12Device* device, 
+		ID3D12GraphicsCommandList* cmd_list, 
+		const void* init_data, 
+		UINT64 byte_size, 
+		ComPtr<ID3D12Resource>& upload_buffer);
 }
